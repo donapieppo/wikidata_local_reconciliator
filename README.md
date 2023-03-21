@@ -24,11 +24,11 @@ Create a `data/wd.db` with this schema:
 
 ```sql
 CREATE TABLE humans (
-	id INTEGER PRIMARY KEY,
+  id INTEGER PRIMARY KEY,
   wiki_id TEXT,
   viaf_id TEXT,
- 	qnames TEXT,
-	qsurnames TEXT,
+  qnames TEXT,
+  qsurnames TEXT,
   name TEXT,
   surname TEXT,
   labels TEXT
@@ -46,7 +46,7 @@ CREATE TABLE wditems (
 CREATE UNIQUE INDEX idx_wditems_wid ON wditems (wiki_id);
 ```
 
-`humans` on the first pass is filled with `qnames` and `qsurnames` which are the wikidata ids of 
+`humans` on the first pass is filled with `qnames` and `qsurnames` which are the wikidata ids of name and surname of the human.
 
   - 'P734' (name)
   - 'Q101352' (family name)
@@ -54,5 +54,10 @@ CREATE UNIQUE INDEX idx_wditems_wid ON wditems (wiki_id);
   - 'Q11879590' (female given name)
   - 'P735' (surname)
 
+For example Douglas Adams has wikidata_id: Q42 
+  - qnames: `['Q463035', 'Q19688263']` 
+  - qsurnames: `['Q351735']`
+
+since `Q463035` -> `Douglas` but on the forst pass we don't know.
 
 
