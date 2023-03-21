@@ -1,21 +1,27 @@
-qnames = {
-        'P734',      # name
+# date of birth (P569) 
+# date of death (P570) 
+# ISNI (P213) 
+# occupation (P106) 
+
+QNAMES = {
+        'P734',       # name
         'Q101352',    # family name (Q101352)
         'Q12308941',  # male given name (Q12308941)
         'Q11879590',  # female given name (Q11879590)
         }
 
-qsurnames = {
+QSURNAMES = {
         'P735'  # surname
         }
 
-qnames_and_surnames = qnames.union(qsurnames)
+QNAMES_AND_SURNAMES = QNAMES.union(QSURNAMES)
 
 languages = [
         'en',
         'it',
         'es',
-        'fr'
+        'fr',
+        'de'
         ]
 
 
@@ -47,8 +53,8 @@ class WDHuman:
         for l in languages:
             self.labels.add(self.get_label(l))
 
-        self.name = self.get_name()
-        self.surname = self.get_surname()
+        self.qnames = self.get_qnames()
+        self.qsurnames = self.get_qsurnames()
         self.viaf_id = self.get_viafid()
 
     def get_viafid(self):
@@ -61,19 +67,22 @@ class WDHuman:
         else:
             return None
 
-    def get_name(self):
-        if 'P735' in self.json['claims']:
-            return [get_datavalue(x) for x in self.json['claims']['P735']]
+    def get_qnames(self):
+        for n in QSURNAMES:
+            if n in self.json['claims']:
+                return [get_datavalue(x) for x in self.json['claims'][n]]
 
-    def get_surname(self):
-        for n in qnames:
+    def get_qsurnames(self):
+        for n in QNAMES:
             if n in self.json['claims']:
                 return [get_datavalue(x) for x in self.json['claims'][n]]
 
     def __str__(self):
         return("human id: " + str(self.wiki_id) +
-               " name: " + str(self.name) +
-               " surname: " + str(self.surname) + " labels: " + str(self.labels))
+               " qnames: " + str(self.qnames) +
+               " qsurnames: " + str(self.qsurnames) + 
+               " labels: " + str(self.labels) +
+               " viafid: " + str(self.viaf_id))
 
 
 class WDItem:
@@ -85,7 +94,7 @@ class WDItem:
     # {'mainsnak': {... 'datavalue': {'value': {... 'id': 'Q5'} ...
     def get_labels(self):
         for x in self.json['claims']['P31']:
-            if x['mainsnak']['datavalue']['value']['id'] in qnames_and_surnames:
+            if x['mainsnak']['datavalue']['value']['id'] in QNAMES_AND_SURNAMES:
                 print("OK")
                 return self.json['labels']
 

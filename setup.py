@@ -11,7 +11,7 @@ here = pathlib.Path(__file__).parent.resolve()
 long_description = (here / "README.md").read_text(encoding="utf-8")
 
 setup(
-    name="wikipedia_db_reconciliation",  
+    name="wikidata_db_reconciliation",  
     version="0.0.1",  
     description="Wikipedia Db Reconciliation",
     author="donapieppo",

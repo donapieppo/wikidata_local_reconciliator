@@ -20,3 +20,39 @@ and then
 ```
 
 
+Create a `data/wd.db` with this schema:
+
+```sql
+CREATE TABLE humans (
+	id INTEGER PRIMARY KEY,
+  wiki_id TEXT,
+  viaf_id TEXT,
+ 	qnames TEXT,
+	qsurnames TEXT,
+  name TEXT,
+  surname TEXT,
+  labels TEXT
+);
+
+CREATE UNIQUE INDEX idx_humans_wid ON humans (wiki_id);
+CREATE UNIQUE INDEX idx_humans_viafid ON humans (viaf_id);
+
+CREATE TABLE wditems (
+  id INTEGER PRIMARY KEY,
+  wiki_id TEXT, 
+  labels TEXT
+);
+
+CREATE UNIQUE INDEX idx_wditems_wid ON wditems (wiki_id);
+```
+
+`humans` on the first pass is filled with `qnames` and `qsurnames` which are the wikidata ids of 
+
+  - 'P734' (name)
+  - 'Q101352' (family name)
+  - 'Q12308941' (male given name)
+  - 'Q11879590' (female given name)
+  - 'P735' (surname)
+
+
+
