@@ -1,13 +1,15 @@
-qnames = [
+qnames = {
         'P734',      # name
-        'Q101352'    # family name (Q101352)
-        'Q12308941'  # male given name (Q12308941)
-        'Q11879590'  # female given name (Q11879590)
-        ]
+        'Q101352',    # family name (Q101352)
+        'Q12308941',  # male given name (Q12308941)
+        'Q11879590',  # female given name (Q11879590)
+        }
 
-qsurnames = [
+qsurnames = {
         'P735'  # surname
-        ]
+        }
+
+qnames_and_surnames = qnames.union(qsurnames)
 
 languages = [
         'en',
@@ -18,10 +20,9 @@ languages = [
 
 
 def check_for_human(j):
-    if 'P31' in j['claims']:
-        for x in j['claims']['P31']:
-            if x['mainsnak']['datavalue']['value']['id'] == 'Q5':
-                return True
+    for x in j['claims']['P31']:
+        if x['mainsnak']['datavalue']['value']['id'] == 'Q5':
+            return True
     return False
 
 
@@ -55,7 +56,10 @@ class WDHuman:
             return [get_datavalue(x) for x in self.json['claims']['P214']]
 
     def get_label(self, lang):
-        return self.json['labels'][lang]['value'] if lang in self.json['labels'] else None
+        if lang in self.json['labels']:
+            return self.json['labels'][lang]['value']
+        else:
+            return None
 
     def get_name(self):
         if 'P735' in self.json['claims']:
@@ -76,25 +80,15 @@ class WDItem:
     def __init__(self, j):
         self.json = j
         self.wiki_id = self.json["id"]
-        self.name = self.wikibase_name()
-        self.surname = self.wikibase_surname()
+        self.labels = self.get_labels()
 
     # {'mainsnak': {... 'datavalue': {'value': {... 'id': 'Q5'} ...
-    def wikibase_name(self):
-        if 'P31' in self.json['claims']:
-            for x in self.json['claims']['P31']:
-                if x['mainsnak']['datavalue']['value']['id'] in qnames:
-                    return x['labels']
-
-    def wikibase_surname(self):
-        if 'P31' in self.json['claims']:
-            for x in self.json['claims']['P31']:
-                if x['mainsnak']['datavalue']['value']['id'] in qsurnames:
-                    return x['labels']
+    def get_labels(self):
+        for x in self.json['claims']['P31']:
+            if x['mainsnak']['datavalue']['value']['id'] in qnames_and_surnames:
+                print("OK")
+                return self.json['labels']
 
     def __str__(self):
         return("wikiitem id: " + str(self.wiki_id) +
-               " name: " + str(self.name) +
-               " surname: " + str(self.surname))
-
-
+               " labels: " + str(self.labels))

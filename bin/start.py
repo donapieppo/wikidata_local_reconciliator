@@ -20,8 +20,10 @@ with open("data/test.json", mode='rt') as f:
 
         if check_for_human(j):
             wdhuman = WDHuman(j)
-            print(wdhuman)
+            #print(wdhuman)
         else:
             wditem = WDItem(j)
-            if wditem.name or wditem.surname:
+            #if wditem.wiki_id == 'Q24223':
+            #    print(json.dumps(j, indent=2))
+            if wditem.labels:
                 print(wditem)
