@@ -55,9 +55,12 @@ CREATE UNIQUE INDEX idx_wditems_wid ON wditems (wiki_id);
   - 'P735' (surname)
 
 For example Douglas Adams has wikidata_id: Q42 
+
   - qnames: `['Q463035', 'Q19688263']` 
   - qsurnames: `['Q351735']`
 
-since `Q463035` -> `Douglas` but on the forst pass we don't know.
+since `Q463035` -> `Douglas` but on the first pass we don't know. 
+We have to reach the item `Q463035` on the wikidata dump to register 
+it in the `wditems` table.
 
 
