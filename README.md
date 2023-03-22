@@ -31,11 +31,13 @@ CREATE TABLE humans (
   qsurnames TEXT,
   name TEXT,
   surname TEXT,
-  labels TEXT
+  labels TEXT,
+  year_of_birth INT,
+  description TEXT
 );
 
 CREATE UNIQUE INDEX idx_humans_wid ON humans (wiki_id);
-CREATE UNIQUE INDEX idx_humans_viafid ON humans (viaf_id);
+CREATE INDEX idx_humans_viafid ON humans (viaf_id);
 
 CREATE TABLE wditems (
   id INTEGER PRIMARY KEY,
@@ -63,4 +65,7 @@ since `Q463035` -> `Douglas` but on the first pass we don't know.
 We have to reach the item `Q463035` on the wikidata dump to register 
 it in the `wditems` table.
 
+## Credits and other stuff
+
+  - [https://akbaritabar.netlify.app/how_to_use_a_wikidata_dump] uses pydash to read json data more 
 
