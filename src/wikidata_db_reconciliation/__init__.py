@@ -28,28 +28,44 @@ languages = [
         ]
 
 
+def extract_value(json_obj, path):
+    keys = path.split('.')
+    current = json_obj
+    for key in keys:
+        try:
+            current = current[key]
+        except (KeyError, TypeError):
+            return None
+    return current
+
+
+def check_value(json_obj, path, expected):
+    return (extract_value(json_obj, path) == expected)
+
+
 def check_if_human(j):
     for x in j['claims']['P31']:
-        if x['mainsnak']['datavalue']['value']['id'] == 'Q5':
-            return True
-    return False
+        try:
+            return check_value(x, 'mainsnak.datavalue.value.id', 'Q5')
+        except (KeyError, TypeError):
+            return False
 
 
 def extract_datavalue(j):
     try:
-        if j['mainsnak']['snaktype'] == 'novalue':
+        if check_value(j, 'mainsnak.snaktype', 'novalue'):
             return None
-        elif j['mainsnak']['datatype'] == 'external-id':
-            return j['mainsnak']['datavalue']['value']
-        elif j['mainsnak']['datatype'] == 'wikibase-item':
-            return j['mainsnak']['datavalue']['value']['id']
-        elif j['mainsnak']['datatype'] == 'time':
-            return j['mainsnak']['datavalue']['value']['time']
+        elif check_value(j, 'mainsnak.datatype', 'external-id'):
+            return extract_value(j, 'mainsnak.datavalue.value')
+        elif check_value(j, 'mainsnak.datatype', 'wikibase-item'):
+            return extract_value(j, 'mainsnak.datavalue.value.id')
+        elif check_value(j, 'mainsnak.datatype', 'time'):
+            return extract_value(j, 'mainsnak.datavalue.value.time')
         else:
             print(j['mainsnak'])
             exit(0) 
             return None
-    except KeyError:
+    except (KeyError, TypeError):
         # can happen instance of is not a valid qualifier for ....
         print(j["id"])
         print(j['mainsnak'])
@@ -68,6 +84,7 @@ class WDHuman:
 
         self.year_of_birth = self.extract_year_of_birth()
         self.description = self.extract_description()
+        self.occupations = self.extract_occupations()
 
     def extract_viafid(self):
         if 'P214' in self.json['claims']:
@@ -109,6 +126,11 @@ class WDHuman:
         for lang in languages:
             if lang in self.json['descriptions']:
                 return self.json['descriptions'][lang]["value"]
+
+    def extract_occupations(self):
+        if 'P106' in self.json['claims']:
+            res = [extract_value(x, "mainsnak.datavalue.value.id") for x in self.json['claims']['P106']]
+            return (None if res == [None] else res)
 
     def __str__(self):
         return("human id: " + str(self.wiki_id) +
