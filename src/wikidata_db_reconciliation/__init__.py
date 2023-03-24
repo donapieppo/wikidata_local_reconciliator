@@ -1,9 +1,17 @@
-# date of birth (P569) 
-# date of death (P570) 
-# ISNI (P213) 
-# occupation (P106) 
-# date of birth (P569) 
-# date of death (Q18748141) 
+# date of birth (P569)
+# date of death (P570)
+# ISNI (P213)
+# occupation (P106)
+# date of birth (P569)
+# date of death (Q18748141)
+
+# profession (Q28640)
+# occupation (Q12737077)
+
+OCCUPATIONS = {
+        'Q28640',    # profession (Q28640)
+        'Q12737077'  # occupation (Q12737077)
+        }
 
 QNAMES = {
         'P734',       # name
