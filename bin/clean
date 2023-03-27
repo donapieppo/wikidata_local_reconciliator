@@ -2,9 +2,9 @@
 
 echo "DELETE\nDELETE\nDELETE!!!"
 
-rm data/wd.db
+rm /home/backup/wd.db
 
-sqlite3 data/wd.db <<EOF
+sqlite3 /home/backup/wd.db <<EOF
 CREATE TABLE humans (
   id INTEGER PRIMARY KEY,
   wiki_id TEXT,

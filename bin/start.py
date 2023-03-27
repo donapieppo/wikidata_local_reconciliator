@@ -5,7 +5,7 @@ import bz2
 import sqlite3
 from wikidata_db_reconciliation import WDHuman, WDItem, check_if_human
 
-connection = sqlite3.connect("data/wd.db")
+connection = sqlite3.connect("/home/backup/wd.db")
 cursor = connection.cursor()
 
 
