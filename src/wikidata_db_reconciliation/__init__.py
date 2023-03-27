@@ -25,6 +25,7 @@ QSURNAMES = {
         }
 
 QNAMES_AND_SURNAMES = QNAMES.union(QSURNAMES)
+QNAMES_AND_SURNAMES_AND_OCCUPATION = QNAMES_AND_SURNAMES.union(OCCUPATIONS)
 
 # in order for description. First present wins.
 languages = [
@@ -86,6 +87,7 @@ class WDHuman:
         self.wiki_id = self.json["id"]
 
         self.labels = self.extract_labels()
+        self.aliases = self.extract_aliases()
         self.qnames = self.extract_qnames()
         self.qsurnames = self.extract_qsurnames()
         self.viaf_id = self.extract_viafid()
@@ -93,6 +95,10 @@ class WDHuman:
         self.year_of_birth = self.extract_year_of_birth()
         self.description = self.extract_description()
         self.occupations = self.extract_occupations()
+
+        # if all
+        # self.wikipedia_names = self.extract_wikipedia_names()
+        self.wikipedia_url = self.extract_wikipedia_url()
 
     def extract_viafid(self):
         if 'P214' in self.json['claims']:
@@ -107,6 +113,33 @@ class WDHuman:
                 if label:
                     res.add(label)
         return (None if res == [None] else res)
+
+    # for now direrent from labels. 
+    def extract_aliases(self):
+        res = set()
+        for lang in languages:
+            if lang in self.json['aliases']:
+                for alias in self.json['aliases'][lang]:
+                    label = alias['value']
+                    if label:
+                        res.add(label)
+        return (None if res == [None] else res)
+
+    # https://it.wikipedia.org/wiki
+    def extract_wikipedia_names(self):
+        res = {}
+        for lang in languages:
+            if lang + 'wiki' in self.json['sitelinks']:
+                res[lang] = self.json['sitelinks'][lang + 'wiki']['title']
+        return res
+
+    # extract first
+    def extract_wikipedia_url(self):
+        for lang in languages:
+            if lang + 'wiki' in self.json['sitelinks']:
+                title = self.json['sitelinks'][lang + 'wiki']['title']
+                if title:
+                    return 'https://' + lang + '.wikipedia.org/wiki/' + title.replace(' ', '_')
 
     def extract_qnames(self):
         for n in QSURNAMES:
@@ -161,6 +194,13 @@ class WDItem:
                 labels = self.json['labels']
                 res = set()
                 for lang in languages:
+                    if (lang in labels):
+                        res.add(labels[lang]['value'])
+                return res
+            elif x['mainsnak']['datavalue']['value']['id'] in OCCUPATIONS:
+                labels = self.json['labels']
+                res = set()
+                for lang in ['it', 'en']:
                     if (lang in labels):
                         res.add(labels[lang]['value'])
                 return res
