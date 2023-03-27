@@ -2,7 +2,7 @@
 
 echo "DELETE\nDELETE\nDELETE!!!"
 
-rm -i data/wd.db
+rm data/wd.db
 
 sqlite3 data/wd.db <<EOF
 CREATE TABLE humans (
@@ -14,9 +14,11 @@ CREATE TABLE humans (
   name TEXT,
   surname TEXT,
   labels TEXT,
+  aliases TEXT,
   year_of_birth INT,
   description TEXT,
-  occupations TEXT
+  occupations TEXT,
+  wikipedia_url TEXT
 );
 
 CREATE UNIQUE INDEX idx_humans_wid ON humans (wiki_id);
@@ -25,8 +27,8 @@ CREATE INDEX idx_humans_viafid ON humans (viaf_id);
 CREATE TABLE names (
   id INTEGER PRIMARY KEY,
   human_id INTEGER,
-  name TEXT,
-  wiki_id TEXT
+  wiki_id TEXT,
+  name TEXT
 );
 
 CREATE INDEX idx_names_human ON names (human_id);

@@ -17,6 +17,11 @@ for row in cursor:
         cursor2.execute("""
           INSERT INTO names (human_id, name, wiki_id) VALUES (?, ?, ?)
           """, (row['id'], x, row['wiki_id']))
+    for x in json.loads(row['aliases']):
+        print(x)
+        cursor2.execute("""
+          INSERT INTO names (human_id, name, wiki_id) VALUES (?, ?, ?)
+          """, (row['id'], x, row['wiki_id']))
     continue
 
     print("------")

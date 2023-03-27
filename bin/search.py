@@ -11,7 +11,11 @@ cursor = connection.cursor()
 what = sys.argv[1]
 
 for row in cursor.execute("""
-        SELECT * FROM humans left join names on humans.id = human_id WHERE names.name LIKE ?
+        SELECT DISTINCT humans.* FROM humans
+        LEFT JOIN names ON humans.id = human_id
+        WHERE names.name LIKE ?
+        COLLATE NOCASE
         """, ("%" + what + "%", )).fetchall():
-    print(str(row["id"]) + "  " + str(json.loads(row["labels"])))
+    firstname = json.loads(row["labels"])[0]
+    print(f"{row['id']} {row['wiki_id']}: {firstname}")
     print(row["description"])
