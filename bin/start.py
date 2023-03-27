@@ -39,7 +39,7 @@ def save_human(wdhuman):
 
 
 # with bz2.open("/home/backup/wikidata-20220103-all.json.gz", mode='rt') as f:
-with open("data/test.json", mode='rt') as f:
+with open("/home/backup/test.json", mode='rt') as f:
     f.read(2)  # skip first two bytes: "{\n"
     i = 0
     for line in f:
