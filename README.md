@@ -32,9 +32,11 @@ CREATE TABLE humans (
   name TEXT,
   surname TEXT,
   labels TEXT,
+  aliases TEXT,
   year_of_birth INT,
   description TEXT,
-  occupations TEXT
+  occupations TEXT,
+  wikpedia_url TEXT
 );
 
 CREATE UNIQUE INDEX idx_humans_wid ON humans (wiki_id);
@@ -43,8 +45,8 @@ CREATE INDEX idx_humans_viafid ON humans (viaf_id);
 CREATE TABLE names (
   id INTEGER PRIMARY KEY,
   human_id INTEGER,
-  name TEXT,
-  wiki_id TEXT
+  wiki_id TEXT,
+  name TEXT
 );
 
 CREATE INDEX idx_names_name ON names (name);
