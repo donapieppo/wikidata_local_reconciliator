@@ -4,7 +4,7 @@ import json
 import sqlite3
 from wikidata_db_reconciliation import WDHuman, WDItem, check_if_human
 
-connection = sqlite3.connect("data/wd.db")
+connection = sqlite3.connect("/home/backup/wd.db")
 connection.row_factory = sqlite3.Row
 cursor = connection.cursor()
 cursor2 = connection.cursor()
