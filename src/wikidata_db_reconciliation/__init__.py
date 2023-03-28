@@ -3,10 +3,13 @@
 # ISNI (P213)
 # occupation (P106)
 # date of birth (P569)
-# date of death (Q18748141)
+# date of death (P570)
+# work period (start) (P2031)
+# work period (end) (P2032)
 
 # profession (Q28640)
 # occupation (Q12737077)
+# field of work (P101)
 
 OCCUPATIONS = {
         'Q28640',    # profession (Q28640)
@@ -92,7 +95,10 @@ class WDHuman:
         self.qsurnames = self.extract_qsurnames()
         self.viaf_id = self.extract_viafid()
 
-        self.year_of_birth = self.extract_year_of_birth()
+        self.year_of_birth = self.extract_year('P569')
+        self.year_of_death = self.extract_year('P570')
+        self.year_work_start = self.extract_year('P2031')
+        self.year_work_end = self.extract_year('P2032')
         self.description = self.extract_description()
         self.occupations = self.extract_occupations()
 
@@ -152,9 +158,9 @@ class WDHuman:
                 return [extract_datavalue(x) for x in self.json['claims'][n]]
 
     # return int with sign
-    def extract_year_of_birth(self):
-        if 'P569' in self.json['claims']:
-            date = extract_datavalue(self.json['claims']['P569'][0])
+    def extract_year(self, p):
+        if p in self.json['claims']:
+            date = extract_datavalue(self.json['claims'][p][0])
             # "+1732-02-22T00:00:00Z"
             # "-0401-01-01T00:00:00Z"
             if date and len(date) == 21:

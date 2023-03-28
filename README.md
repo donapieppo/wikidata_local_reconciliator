@@ -34,6 +34,7 @@ CREATE TABLE humans (
   labels TEXT,
   aliases TEXT,
   year_of_birth INT,
+  year_of_death INT,
   description TEXT,
   occupations TEXT,
   wikpedia_url TEXT

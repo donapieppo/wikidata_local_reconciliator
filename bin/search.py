@@ -4,7 +4,7 @@ import sys
 import sqlite3
 import json
 
-connection = sqlite3.connect("data/wd.db")
+connection = sqlite3.connect("/home/backup/wd.db")
 connection.row_factory = sqlite3.Row
 cursor = connection.cursor()
 
@@ -18,4 +18,4 @@ for row in cursor.execute("""
         """, ("%" + what + "%", )).fetchall():
     firstname = json.loads(row["labels"])[0]
     print(f"{row['id']} {row['wiki_id']}: {firstname}")
-    print(row["description"])
+    print(f"   {row['description']}")

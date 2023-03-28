@@ -19,10 +19,11 @@ def save_human(wdhuman):
             labels,
             aliases,
             year_of_birth,
+            year_of_death,
             description,
             occupations,
             wikipedia_url
-        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         """, (
             wdhuman.wiki_id,
             (json.dumps(wdhuman.viaf_id) if wdhuman.viaf_id else None),
@@ -31,6 +32,7 @@ def save_human(wdhuman):
             json.dumps(list(wdhuman.labels)),
             json.dumps(list(wdhuman.aliases)),
             wdhuman.year_of_birth,
+            wdhuman.year_of_death,
             wdhuman.description,
             json.dumps(wdhuman.occupations),
             wdhuman.wikipedia_url
