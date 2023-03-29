@@ -16,17 +16,19 @@ def save_human(wdhuman):
             viaf_id,
             qnames,
             qsurnames,
+            label, 
             year_of_birth,
             year_of_death,
             description,
             occupations,
             wikipedia_url
-        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         """, (
             wdhuman.wiki_id,
             (json.dumps(wdhuman.viaf_id) if wdhuman.viaf_id else None),
             json.dumps(wdhuman.qnames),
             json.dumps(wdhuman.qsurnames),
+            wdhuman.label, 
             wdhuman.year_of_birth,
             wdhuman.year_of_death,
             wdhuman.description,
