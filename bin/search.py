@@ -11,9 +11,11 @@ cursor = connection.cursor()
 what = sys.argv[1]
 
 for row in cursor.execute("""
-        SELECT DISTINCT names.name, humans.* FROM humans
+        SELECT DISTINCT humans.* FROM humans
         LEFT JOIN names ON humans.id = human_id
-        WHERE names.name LIKE ?
+        WHERE names.name = ?
         COLLATE NOCASE
-        """, ("%" + what + "%", )).fetchall():
-    print(f"{row['id']} {row['wiki_id']}: {row['name']}   ({row['description']})")
+        """, (what, )).fetchall():
+    print(f"\n{row['id']} {row['wiki_id']}: {row['label']} ({row['description']})\n")
+    for k in dict(row):
+        print(f"{k}: {row[k]}")
