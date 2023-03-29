@@ -121,6 +121,8 @@ class WDHuman:
                     if first:
                         return str(label)
                     res.add(label)
+        if first:
+            return ''
         return (None if res == [None] else res)
 
     # for now direrent from labels. 
@@ -184,9 +186,7 @@ class WDHuman:
 
     def __str__(self):
         return("human id: " + str(self.wiki_id) +
-               " qnames: " + str(self.qnames) +
-               " qsurnames: " + str(self.qsurnames) + 
-               " labels: " + str(self.labels) +
+               " label: " + str(self.label) +
                " viafid: " + str(self.viaf_id))
 
 
