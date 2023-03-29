@@ -90,6 +90,7 @@ class WDHuman:
         self.wiki_id = self.json["id"]
 
         self.labels = self.extract_labels()
+        self.label  = self.extract_labels(first=True)
         self.aliases = self.extract_aliases()
         self.qnames = self.extract_qnames()
         self.qsurnames = self.extract_qsurnames()
@@ -111,12 +112,14 @@ class WDHuman:
             res = [extract_datavalue(x) for x in self.json['claims']['P214']]
             return (None if res == [None] else res)
 
-    def extract_labels(self):
+    def extract_labels(self, first=False):
         res = set()
         for lang in languages:
             if lang in self.json['labels']:
                 label = self.json['labels'][lang]['value']
                 if label:
+                    if first:
+                        return label
                     res.add(label)
         return (None if res == [None] else res)
 
