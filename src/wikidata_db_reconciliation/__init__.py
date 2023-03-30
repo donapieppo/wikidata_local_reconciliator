@@ -10,6 +10,7 @@
 # profession (Q28640)
 # occupation (Q12737077)
 # field of work (P101)
+# notable work (P800) 
 
 OCCUPATIONS = {
         'Q28640',    # profession (Q28640)
@@ -106,6 +107,7 @@ class WDHuman:
         # if all
         # self.wikipedia_names = self.extract_wikipedia_names()
         self.wikipedia_url = self.extract_wikipedia_url()
+        self.nreferences = self.count_references()
 
     def extract_viafid(self):
         if 'P214' in self.json['claims']:
@@ -150,7 +152,8 @@ class WDHuman:
             if lang + 'wiki' in self.json['sitelinks']:
                 title = self.json['sitelinks'][lang + 'wiki']['title']
                 if title:
-                    return 'https://' + lang + '.wikipedia.org/wiki/' + title.replace(' ', '_')
+                    title = title.replace(' ', '_')
+                    return f"https://{lang}.wikipedia.org/wiki/{title}"
 
     def extract_qnames(self):
         for n in QSURNAMES:
@@ -184,10 +187,18 @@ class WDHuman:
             res = [extract_value(x, "mainsnak.datavalue.value.id") for x in self.json['claims']['P106']]
             return (None if res == [None] else res)
 
+    def count_references(self):
+        n = 0
+        # for interest in ["P31", "P569"]:
+        #     if interest in self.json['claims']:
+        if "P800" in self.json['claims']:
+            n = len(self.json['claims']["P800"])
+        return n
+
     def __str__(self):
         return("human id: " + str(self.wiki_id) +
                " label: " + str(self.label) +
-               " viafid: " + str(self.viaf_id))
+               " description: " + str(self.description))
 
 
 class WDItem:
