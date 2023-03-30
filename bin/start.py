@@ -10,30 +10,33 @@ cursor = connection.cursor()
 
 
 def save_human(wdhuman):
+    print(wdhuman)
     cursor.execute("""
         INSERT INTO humans (
             wiki_id,
             viaf_id,
             qnames,
             qsurnames,
-            label, 
+            label,
             year_of_birth,
             year_of_death,
             description,
             occupations,
-            wikipedia_url
-        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            wikipedia_url,
+            nreferences
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         """, (
             wdhuman.wiki_id,
             (json.dumps(wdhuman.viaf_id) if wdhuman.viaf_id else None),
             json.dumps(wdhuman.qnames),
             json.dumps(wdhuman.qsurnames),
-            wdhuman.label, 
+            wdhuman.label,
             wdhuman.year_of_birth,
             wdhuman.year_of_death,
             wdhuman.description,
             json.dumps(wdhuman.occupations),
-            wdhuman.wikipedia_url
+            wdhuman.wikipedia_url,
+            wdhuman.nreferences
             )
                   )
     connection.commit()
@@ -46,7 +49,6 @@ def save_names(human_id, wdhuman):
           INSERT INTO names (human_id, wiki_id, name)
           VALUES (?, ?, ?)
         """, (human_id, wdhuman.wiki_id, name))
-    connection.commit()
 
 
 # with bz2.open("/home/backup/latest-all.json.bz2", mode='rt') as f:
