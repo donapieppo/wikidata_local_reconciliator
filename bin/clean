@@ -1,6 +1,8 @@
 #!/bin/bash
 
 echo "DELETE\nDELETE\nDELETE!!!"
+echo "ctrl+c to NOT DELETE ALL"
+read pippo
 
 rm /home/backup/wd.db
 
@@ -18,7 +20,8 @@ CREATE TABLE humans (
   year_of_death INT,
   description TEXT,
   occupations TEXT,
-  wikipedia_url TEXT
+  wikipedia_url TEXT,
+  nreferences INTEGER
 );
 
 CREATE UNIQUE INDEX idx_humans_wid ON humans (wiki_id);
