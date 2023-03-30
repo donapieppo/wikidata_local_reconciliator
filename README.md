@@ -5,20 +5,19 @@ From a wikidata database dump prepare for reconciliation
 ## Start
 
 Visit [https://www.wikidata.org/wiki/Wikidata:Database_download] and get
-(better vith torrent) latest json.bz2
+latest json.bz2. You can also split it while downloading
 
-To do some testing
-
-```bash
-zcat /home/backup/wikidata-20220103-all.json.gz | head -5000 > data/test.json
+```
+mkdir wikidata
+wget -O - https://dumps.wikimedia.org/wikidatawiki/entities/latest-all.json.bz2 | bzcat | split -l 100000 -d -a 4 --filter='bzip2 > wikidata/$FILE.json.bz2' - split-
 ```
 
-and then
+To split in different bz2 files:
 
 ```bash
-./bin/start.py
+mkdir wikidata
+bzcat latest-all.json.bz2 | split -l 100000 -d -a 4 --filter='bzip2 > wikidata/$FILE.json.bz2' - split-
 ```
-
 
 Create a `data/wd.db` with this schema:
 
@@ -36,7 +35,8 @@ CREATE TABLE humans (
   year_of_death INT,
   description TEXT,
   occupations TEXT,
-  wikpedia_url TEXT
+  wikpedia_url TEXT,
+  nreferences INT
 );
 
 CREATE UNIQUE INDEX idx_humans_wid ON humans (wiki_id);
@@ -61,6 +61,20 @@ CREATE TABLE wditems (
 CREATE UNIQUE INDEX idx_wditems_wid ON wditems (wiki_id);
 ```
 
+You may use
+
+```bash
+/bin/restart
+```
+
+To start parsing
+
+```bash
+./bin/parse.py wikidata/split-0000.json.bz2
+```
+
+## DB 
+
 `humans` on the first pass is filled with `qnames` and `qsurnames` which are the wikidata ids of name and surname of the human.
 
   - 'P734' (name)
@@ -81,4 +95,9 @@ it in the `wditems` table.
 ## Credits and other stuff
 
   - [https://akbaritabar.netlify.app/how_to_use_a_wikidata_dump] uses pydash to read json data more 
+  - [https://madflex.de/splitting-a-big-file-with-split] for splitting the big wikidata file
 
+## TODO
+
+  - [https://github.com/ijl/orjson]
+  - ...
