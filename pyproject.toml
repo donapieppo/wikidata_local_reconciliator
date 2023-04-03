@@ -3,7 +3,7 @@ requires = ["setuptools", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "wikipedia_db_reconciliation"
+name = "wikidata_db_reconciliation"
 version = "0.0.1"
 authors = [
   { name="Donapieppo", email="donapieppo@yahoo.it" },
