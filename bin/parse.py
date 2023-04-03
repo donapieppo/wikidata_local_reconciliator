@@ -18,6 +18,7 @@ if (not exists(FILE)):
     print(f"No file {FILE}")
     exit(1)
 
+FIRST_FILE = '0000' in FILE
 
 connection = sqlite3.connect("/home/backup/wd.db")
 cursor = connection.cursor()
@@ -66,7 +67,8 @@ def save_names(human_id, wdhuman):
 
 
 with bz2.open(FILE, mode='rt') as f:
-    f.read(2)  # skip first two bytes: "{\n"
+    if FIRST_FILE:
+        f.read(2)  # skip first two bytes: "{\n"
     i = 0
     for line in f:
         print(i)
