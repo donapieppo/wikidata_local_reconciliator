@@ -3,12 +3,12 @@ requires = ["setuptools", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "wikidata_db_reconciliation"
+name = "wikidata_local_reconciliation"
 version = "0.0.1"
 authors = [
   { name="Donapieppo", email="donapieppo@yahoo.it" },
 ]
-description = "From a wikidata database dump prepare for reconciliation"
+description = "From a wikidata database dump prepare for human reconciliation"
 readme = "README.md"
 requires-python = ">=3.7"
 classifiers = [
