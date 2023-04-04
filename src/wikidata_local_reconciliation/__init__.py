@@ -10,7 +10,7 @@
 # profession (Q28640)
 # occupation (Q12737077)
 # field of work (P101)
-# notable work (P800) 
+# notable work (P800)
 
 OCCUPATIONS = {
         'Q28640',    # profession (Q28640)
