@@ -63,7 +63,7 @@ def save_names(human_id, wdhuman):
         cursor.execute("""
           INSERT INTO names (human_id, wiki_id, name)
           VALUES (?, ?, ?)
-        """, (human_id, wdhuman.wiki_id, name))
+        """, (human_id, wdhuman.wiki_id, name.lower()))
 
 
 with bz2.open(FILE, mode='rt') as f:
