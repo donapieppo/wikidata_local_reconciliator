@@ -1,6 +1,10 @@
-# wikidata database reconciliation
+# Wikidata Local Reconciliation
 
-From a wikidata database dump prepare for reconciliation
+From a wikidata database dump build a sqlite3 db useful for humans reconciliation.
+
+From the wikidata dump we take all names and aliases of humans(Q5) with all occupations, birth and death dates and some "references number" 
+in order to query a wikidata id given a name.
+
 
 ## Start
 
@@ -12,14 +16,14 @@ mkdir wikidata
 wget -O - https://dumps.wikimedia.org/wikidatawiki/entities/latest-all.json.bz2 | bzcat | split -l 100000 -d -a 4 --filter='bzip2 > wikidata/$FILE.json.bz2' - split-
 ```
 
-To split in different bz2 files:
+If you already have downloaded the dump, you can just split with:
 
 ```bash
 mkdir wikidata
 bzcat latest-all.json.bz2 | split -l 100000 -d -a 4 --filter='bzip2 > wikidata/$FILE.json.bz2' - split-
 ```
 
-Create a `data/wd.db` with this schema:
+Create a `data/wd.db` sqlite3 database with this schema:
 
 ```sql
 CREATE TABLE humans (
