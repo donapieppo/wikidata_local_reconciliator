@@ -63,6 +63,17 @@ CREATE TABLE wditems (
 );
 
 CREATE UNIQUE INDEX idx_wditems_wid ON wditems (wiki_id);
+
+CREATE TABLE viafs (
+  id INTEGER PRIMARY KEY,
+  viaf_id TEXT,
+  human_id INTEGER,
+  wiki_id TEXT
+);
+
+CREATE INDEX idx_viafs_viaf ON viafs (viaf_id);
+CREATE INDEX idx_viafs_wiki ON viafs (wiki_id);
+CREATE INDEX idx_viafs_human ON viafs (human_id);
 ```
 
 You may use

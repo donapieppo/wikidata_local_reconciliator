@@ -54,7 +54,7 @@ class WDOccupation():
         row['occupations'] = set(json.loads(row['occupations']))
         return(len(row['occupations'].intersection(occupations)) > 0)
 
-    def describe_occupations(self, names):
+    def describe(self, names):
         """ can receve json.dump of array of occupatons or a list"""
 
         if names[0] == '[':

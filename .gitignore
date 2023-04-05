@@ -1,4 +1,6 @@
-src/wikidata_db_reconciliation/__pycache__/
+src/wikidata_local_reconciliation/__pycache__/
+src/wikidata_local_reconciliation.egg-info/
 data/wd.db
 data/text.json
 tags
+__pycache__
