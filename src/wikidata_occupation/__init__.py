@@ -18,7 +18,7 @@ OCCUPATIONS = {
 }
 
 
-class WDOccupation():
+class WikidataOccupation():
     def __init__(self):
         self.occupations_by_name = OCCUPATIONS
         self.occupations_by_qcode = {value: key for key, value in OCCUPATIONS.items()}
