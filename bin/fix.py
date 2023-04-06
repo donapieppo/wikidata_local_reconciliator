@@ -17,8 +17,8 @@ for row in cursor_human:
     print(row['qsurnames'])
     print("--- end row ----")
     total = []
-    n = [] if row['qnames'] == '[null]' else json.loads(row['qnames'])
-    s = [] if row['qsurnames'] == '[null]' else json.loads(row['qsurnames'])
+    n = json.loads(row['qnames']) if row['qnames'] else []
+    s = json.loads(row['qsurnames']) if row['qsurnames'] else []
     if n:
         print(n)
         total += n
