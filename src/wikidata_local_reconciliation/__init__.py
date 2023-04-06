@@ -202,27 +202,35 @@ class WDHuman:
 
 
 class WDItem:
-    def __init__(self, j):
+    def __init__(self, j, first_label=False):
         self.json = j
+        self.first_label = first_label 
         self.wiki_id = self.json["id"]
         self.labels = self.extract_labels()
 
     # {'mainsnak': {... 'datavalue': {'value': {... 'id': 'Q5'} ...
     def extract_labels(self):
+        # return labels if interesting item (name, surname, occupation)
         for x in self.json['claims']['P31']:
             if x['mainsnak']['datavalue']['value']['id'] in QNAMES_AND_SURNAMES:
                 labels = self.json['labels']
                 res = set()
                 for lang in languages:
                     if (lang in labels):
-                        res.add(labels[lang]['value'])
+                        if self.first_label:
+                            return labels[lang]['value']
+                        else:
+                            res.add(labels[lang]['value'])
                 return res
             elif x['mainsnak']['datavalue']['value']['id'] in OCCUPATIONS:
                 labels = self.json['labels']
                 res = set()
                 for lang in ['it', 'en']:
                     if (lang in labels):
-                        res.add(labels[lang]['value'])
+                        if self.first_label:
+                            return labels[lang]['value']
+                        else:
+                            res.add(labels[lang]['value'])
                 return res
         return None
 
