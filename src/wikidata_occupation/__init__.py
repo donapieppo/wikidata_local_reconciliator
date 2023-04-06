@@ -36,7 +36,7 @@ class WikidataOccupation():
 
     def list_occupations(self):
         print(self.occupations_by_name)
-        print(self.self.occupations_by_qcode)
+        print(self.occupations_by_qcode)
 
     # True / False
     def check(self, row, occupations):
@@ -52,7 +52,7 @@ class WikidataOccupation():
             occupations = self.qcodes
 
         row['occupations'] = set(json.loads(row['occupations']))
-        return(len(row['occupations'].intersection(occupations)) > 0)
+        return len(row['occupations'].intersection(occupations)) > 0 
 
     def describe(self, names):
         """ can receve json.dump of array of occupatons or a list"""
@@ -64,5 +64,4 @@ class WikidataOccupation():
 
         if names[0][0] == 'Q':
             return([self.get_name_by_qcode(name) for name in names])
-        else:
-            return([self.get_qcode_by_name(name) for name in names])
+        return([self.get_qcode_by_name(name) for name in names])
