@@ -52,16 +52,17 @@ class WikidataOccupation():
             occupations = self.qcodes
 
         row['occupations'] = set(json.loads(row['occupations']))
-        return len(row['occupations'].intersection(occupations)) > 0 
+        return len(row['occupations'].intersection(occupations)) > 0
 
     def describe(self, names):
-        """ can receve json.dump of array of occupatons or a list"""
+        """ can receive json.dump of array of occupatons or a list"""
 
-        if names[0] == '[':
-            names = json.loads(names)
-        else:
-            names = names.split(', ')
+        if isinstance(names, str):
+            if names[0] == '[':
+                names = json.loads(names)
+            else:
+                names = names.split(', ')
 
-        if names[0][0] == 'Q':
+        if list(names)[0][0] == 'Q':
             return([self.get_name_by_qcode(name) for name in names])
         return([self.get_qcode_by_name(name) for name in names])

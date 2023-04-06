@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 import sys
-from wd_occupation import WDOccupation
+from wikidata_occupation import WikidataOccupation
 
 if len(sys.argv) < 2:
     print("""
@@ -13,5 +13,5 @@ Esempi:
 
 q = sys.argv[1]
 
-wdo = WDOccupation()
+wdo = WikidataOccupation()
 print(wdo.describe(q))
