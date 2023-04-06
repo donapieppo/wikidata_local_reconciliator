@@ -8,11 +8,11 @@ OCCUPATIONS = {
         'novelist': 'Q6625963',
         'video_artist': 'Q18216771',
         'photographer': 'Q33231',
-        'sound_artist': 'Q19850998', 
+        'sound_artist': 'Q19850998',
         'theatrical_director': 'Q3387717',
         'lyricist': 'Q822146',
-        'journalist': 'Q1930187', 
-        'poet': 'Q49757', 
+        'journalist': 'Q1930187',
+        'poet': 'Q49757',
         'painter': 'Q1028181',
         'actor': 'Q33999'
 }

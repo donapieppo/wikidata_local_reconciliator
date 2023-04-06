@@ -71,7 +71,7 @@ with bz2.open(FILE, mode='rt') as f:
         f.read(2)  # skip first two bytes: "{\n"
     i = 0
     for line in f:
-        print(i)
+        print(f"{i}   {line[0:30]}")
         i += 1
         j = json.loads(line.rstrip(',\n'))
         if ('P31' not in j['claims']):
