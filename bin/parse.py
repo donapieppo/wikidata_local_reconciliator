@@ -6,7 +6,7 @@ import bz2
 import sqlite3
 from os.path import exists
 
-from wikidata_db_reconciliation import WDHuman, WDItem, check_if_human
+from wikidata_local_parser import WDHuman, WDItem, check_if_human
 
 if len(sys.argv) < 2:
     print("Need file name")
@@ -58,12 +58,22 @@ def save_human(wdhuman):
     return cursor.lastrowid
 
 
+def save_wditem(wditem):
+    cursor.execute("""
+      INSERT INTO wditems (wiki_id, labels) VALUES (?, ?)
+      """, (wditem.wiki_id, json.dumps(list(wditem.labels))))
+
+
 def save_names(human_id, wdhuman):
     for name in wdhuman.labels.union(wdhuman.aliases):
         cursor.execute("""
           INSERT INTO names (human_id, wiki_id, name)
           VALUES (?, ?, ?)
         """, (human_id, wdhuman.wiki_id, name.lower()))
+
+
+def save_viafs(human_id, wdhuman):
+    print(wdhuman)
 
 
 with bz2.open(FILE, mode='rt') as f:
@@ -81,13 +91,11 @@ with bz2.open(FILE, mode='rt') as f:
             wdhuman = WDHuman(j)
             human_id = save_human(wdhuman)
             save_names(human_id, wdhuman)
-        # else:
-        #     wditem = WDItem(j)
-        #     if wditem.labels:
-        #         cursor.execute("""
-        #           INSERT INTO wditems (wiki_id, labels) VALUES (?, ?)
-        #           """, (wditem.wiki_id, json.dumps(list(wditem.labels))))
-        #         connection.commit()
+            save_viafs(human_id, wdhuman)
+        else:
+            wditem = WDItem(j)
+            if wditem.labels:
+                save_wditem(wditem)
 
 connection.commit()
 connection.close()

@@ -9,6 +9,21 @@ connection.row_factory = sqlite3.Row
 cursor_human = connection.cursor()
 cursor_wditem = connection.cursor()
 
+
+def update_human(human_id, name, surname):
+    if not (human_id and name and surname):
+        return False
+
+    cursor_human.execute("""
+        UPDATE humans SET (
+            name=?
+            surname=?
+            ) WHERE id=?
+        """, (name, surname, human_id))
+    connection.commit()
+    return cursor_human.lastrowid
+
+
 cursor_human.execute("SELECT * from humans")
 
 for row in cursor_human:
