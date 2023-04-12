@@ -14,7 +14,8 @@ OCCUPATIONS = {
         'journalist': 'Q1930187',
         'poet': 'Q49757',
         'painter': 'Q1028181',
-        'actor': 'Q33999'
+        'actor': 'Q33999',
+        'composer': 'Q36834'
 }
 
 
