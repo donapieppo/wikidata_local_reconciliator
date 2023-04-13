@@ -18,6 +18,14 @@ class TestWikidataLocalReconciliator(unittest.TestCase):
         res = reconciliator.ask(' maRtin  (12) scorsese (1970-200)  ', 2000, 'film_director')
         self.assertEqual(res['wiki_id'], "Q41148")
 
+    def test_strange_name3(self):
+        res = reconciliator.ask(' maRtin-scorsese ', 2000, 'film_director')
+        self.assertEqual(res['wiki_id'], "Q41148")
+
+    def test_with_unidecode_name(self):
+        res = reconciliator.ask(' maRtin-scorsésé ', 2000, 'film_director')
+        self.assertEqual(res['wiki_id'], "Q41148")
+
     def test_wrong_year(self):
         res = reconciliator.ask('martin scorsese', 1925, 'film_director')
         self.assertEqual(res, None)

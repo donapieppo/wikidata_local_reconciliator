@@ -26,8 +26,8 @@ def split_names(names, separator=None):
 
 def update_if_different(db, new_hash, creator):
     updated = False
-    
-    if creator.name != new_hash['label']: 
+
+    if creator.name != new_hash['label']:
         print(f"INCOHERENT name -{creator.name}- != -{new_hash['name']}-")
         creator.name = new_hash['label']
         updated = True

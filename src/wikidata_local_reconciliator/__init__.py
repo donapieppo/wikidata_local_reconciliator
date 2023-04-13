@@ -21,7 +21,7 @@ class WikidataLocalReconciliator():
         else:
             return(True)
 
-    def clear_name(self, name):
+    def clear_name(self, name, replace_dash=False, with_unidecode=False):
         """ Clear the name and return it """
         # fist lower the name since in db they are lowercase
         name = name.lower()
@@ -29,6 +29,10 @@ class WikidataLocalReconciliator():
         name = re.sub(r'\(.*?\)', '', name)
         # strip spaces and 2... spaces becomes one
         name = re.sub(r'\s{2,}', ' ', name).strip()
+        if replace_dash:
+            name = re.sub(r'-', ' ', name)
+        if with_unidecode:
+            name = unidecode(name)
         return(name)
 
     def fix_viaf(self, row):
@@ -61,12 +65,13 @@ class WikidataLocalReconciliator():
 
     # re.sub(r'-',' ', name)
     # unidecode(name)
-    def ask(self, name, year=None, occupations=None):
+    def search(self, name, year=None, occupations=None):
+        name = self.clear_name(name)
         all_rows = self.cursor.execute("""
             SELECT DISTINCT humans.* FROM humans
             LEFT JOIN names ON humans.id = human_id
             WHERE names.name = ?
-            """, (self.clear_name(name), )).fetchall()
+            """, (name, )).fetchall()
         # COLLATE NOCASE
 
         best = None
@@ -82,6 +87,20 @@ class WikidataLocalReconciliator():
                     second = row
         return(best if best else second)
 
+    def ask(self, name, year=None, occupations=None):
+        cname = self.clear_name(name)
+        res = self.search(cname, year=year, occupations=occupations)
+        if not res:
+            cname = self.clear_name(name, replace_dash=True)
+            if cname != name:
+                res = self.search(cname, year=year, occupations=occupations)
+        
+        if not res:
+            cname = self.clear_name(name, replace_dash=True, with_unidecode=True)
+            if cname != name:
+                res = self.search(cname, year=year, occupations=occupations)
+        return res
+        
     def show_occupations(self, res):
         if res:
             print(res["occupations"])
