@@ -15,6 +15,9 @@ class WikidataLocalReconciliator():
         self.cursor = connection.cursor()
         self.wd_occupation = WikidataOccupation()
 
+    def add_occupation(self, name, wiki_id):
+        self.wd_occupation.add_occupation(name, wiki_id)
+
     def check_year(self, row, year):
         if year and row['year_of_birth']:
             return row['year_of_birth'] < year
