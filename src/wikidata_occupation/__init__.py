@@ -15,7 +15,8 @@ OCCUPATIONS = {
         'poet': 'Q49757',
         'painter': 'Q1028181',
         'actor': 'Q33999',
-        'composer': 'Q36834'
+        'composer': 'Q36834',
+        'illustrator': 'Q644687'
 }
 
 
@@ -24,6 +25,11 @@ class WikidataOccupation():
         self.occupations_by_name = OCCUPATIONS
         self.occupations_by_qcode = {value: key for key, value in OCCUPATIONS.items()}
         self.qcodes = set(OCCUPATIONS.values())
+
+    def add_occupation(self, name, wiki_id):
+        self.occupations_by_name[name] = wiki_id
+        self.occupations_by_qcode[wiki_id] = name
+        self.qcodes.add(wiki_id)
 
     def get_name_by_qcode(self, q):
         if q in self.occupations_by_qcode:
