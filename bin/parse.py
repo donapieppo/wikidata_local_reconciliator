@@ -1,103 +1,45 @@
 #!/usr/bin/env python3
 
-import sys
+import sys, argparse
 import json
 import bz2
-import sqlite3
 from os.path import exists
 
-from wikidata_local_parser import WDHuman, WDItem, check_if_human
+from wikidata_local_parser import WikidataLocalParser
 
-if len(sys.argv) < 2:
-    print("Need file name")
-    exit(0)
+args = argparse.ArgumentParser(description='Parse a wikidata gz dump file and save in sqlite3 db.')
+args.add_argument('-f', metavar='filename', nargs=1, type=str,
+                    help='the dump wikipedia file in gz format.',
+                    required=True)
+args.add_argument('-db', metavar='filename', nargs=1, type=str,
+                    help='the sqlite3 file to save data.',
+                    required=True)
 
-FILE = sys.argv[1]
+args = args.parse_args()
+filename = args.f[0]
+db = args.db[0]
 
-if (not exists(FILE)):
-    print(f"No file {FILE}")
+if (not exists(filename)):
+    print(f"No file {filename}")
     exit(1)
 
-FIRST_FILE = '0000' in FILE
-
-connection = sqlite3.connect("/home/backup/wd.db")
-cursor = connection.cursor()
-
-
-def save_human(wdhuman):
-    print(wdhuman)
-    cursor.execute("""
-        INSERT INTO humans (
-            wiki_id,
-            viaf_id,
-            qnames,
-            qsurnames,
-            label,
-            year_of_birth,
-            year_of_death,
-            description,
-            occupations,
-            wikipedia_url,
-            nreferences
-        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-        """, (
-            wdhuman.wiki_id,
-            (json.dumps(wdhuman.viaf_id) if wdhuman.viaf_id else None),
-            json.dumps(wdhuman.qnames),
-            json.dumps(wdhuman.qsurnames),
-            wdhuman.label,
-            wdhuman.year_of_birth,
-            wdhuman.year_of_death,
-            wdhuman.description,
-            json.dumps(wdhuman.occupations),
-            wdhuman.wikipedia_url,
-            wdhuman.nreferences
-            )
-                  )
-    connection.commit()
-    return cursor.lastrowid
+if (not exists(db)):
+    print(f"No file {db}. Please prepare the sqlite3 db with ./bin/restart.py -db {db}")
+    exit(1)
 
 
-def save_wditem(wditem):
-    cursor.execute("""
-      INSERT INTO wditems (wiki_id, labels) VALUES (?, ?)
-      """, (wditem.wiki_id, json.dumps(list(wditem.labels))))
+parser = WikidataLocalParser(db)
 
-
-def save_names(human_id, wdhuman):
-    for name in wdhuman.labels.union(wdhuman.aliases):
-        cursor.execute("""
-          INSERT INTO names (human_id, wiki_id, name)
-          VALUES (?, ?, ?)
-        """, (human_id, wdhuman.wiki_id, name.lower()))
-
-
-def save_viafs(human_id, wdhuman):
-    print(wdhuman)
-
-
-with bz2.open(FILE, mode='rt') as f:
-    if FIRST_FILE:
+with bz2.open(filename, mode='rt') as f:
+    if '0000' in filename:
         f.read(2)  # skip first two bytes: "{\n"
     i = 0
     for line in f:
-        print(f"{i}   {line[0:30]}")
+        print(f"{i} {line[0:35]}")
         i += 1
         j = json.loads(line.rstrip(',\n'))
-        if ('P31' not in j['claims']):
-            continue  # P31 istance of
+        parser.save(j)
 
-        if check_if_human(j):
-            wdhuman = WDHuman(j)
-            human_id = save_human(wdhuman)
-            save_names(human_id, wdhuman)
-            save_viafs(human_id, wdhuman)
-        else:
-            wditem = WDItem(j)
-            if wditem.labels:
-                save_wditem(wditem)
-
-connection.commit()
-connection.close()
+parser.close()
 
 # print(json.dumps(j, indent=2))

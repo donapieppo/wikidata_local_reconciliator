@@ -1,9 +1,31 @@
 # Wikidata Local Reconciliation
 
-From a wikidata database dump build a sqlite3 db useful for reconciliation of authors from the name.
+From a wikidata database dump we build a sqlite3 db useful for reconciliation of authors.
 
 From the wikidata dump we take all names and aliases of humans(Q5) with all occupations, birth and death dates and some "references number" 
 in order to query for wikidata id given a name.
+
+As an example, given `/home/data/wd.db` as the sqlite3 created:
+
+```python
+from wikidata_local_reconciliator import WikidataLocalReconciliator
+
+reconciliator = WikidataLocalReconciliator(db_file='/home/data/wd.db')
+result = reconciliator.ask('martin scorsese', 2000, 'film_director')
+```
+
+returns the following result (main data):
+
+```python3
+'id': 697, 
+'wiki_id': 'Q41148', 
+'viaf_id': '111716145', 
+'label': 'Martin Scorsese', 
+'year_of_birth': 1942, 
+'description': 'regista, attore, sceneggiatore e produttore cinematografico italo-statunitense (1942-)', 
+'occupations': {'Q3282637', 'Q7042855', 'Q10800557', 'Q28389', 'Q2059704', 'Q3455803', 'Q2405480', 'Q2526255'}, 
+'wikipedia_url': 'https://it.wikipedia.org/wiki/Martin_Scorsese'
+```
 
 ## Start
 
@@ -48,7 +70,6 @@ CREATE INDEX idx_humans_viafid ON humans (viaf_id);
 CREATE TABLE names (
   id INTEGER PRIMARY KEY,
   human_id INTEGER,
-  wiki_id TEXT,
   name TEXT
 );
 
@@ -78,13 +99,13 @@ CREATE INDEX idx_viafs_human ON viafs (human_id);
 You may use
 
 ```bash
-/bin/restart
+/bin/restart.py -db /tmp/pippo.db
 ```
 
 To start parsing
 
 ```bash
-./bin/parse.py wikidata/split-0000.json.bz2
+./bin/parse.py -f /home/backup/wikidata/split-0019.json.bz2 -db /tmp/pippo.db
 ```
 
 ## DB 
