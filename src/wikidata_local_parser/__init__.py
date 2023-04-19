@@ -85,5 +85,6 @@ class WikidataLocalParser:
                 wditem.save(self.cursor)
 
     def close(self):
+        """ Close db connection. """
         self.connection.commit()
         self.connection.close()

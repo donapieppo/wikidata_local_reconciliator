@@ -34,6 +34,15 @@ class TestWikidataLocalReconciliator(unittest.TestCase):
         res = reconciliator.ask('martin scorsese', 2000, 'poet')
         self.assertEqual(res, None)
 
+    def test_wrong_default_occupation(self):
+        res = reconciliator.ask('achille occhetto')
+        self.assertEqual(res, None)
+
+    def test_any_occupation(self):
+        res = reconciliator.ask('achille occhetto', occupations=False)
+        self.assertEqual(res['wiki_id'], "Q340239")
+
+
 
 if __name__ == '__main__':
     unittest.main()

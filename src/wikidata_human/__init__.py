@@ -62,19 +62,22 @@ class WikidataHuman:
     # extract first
     def extract_wikipedia_url(self):
         for lang in self.languages:
-            if lang + 'wiki' in self.json['sitelinks']:
-                title = self.json['sitelinks'][lang + 'wiki']['title']
+            field = lang + 'wiki'
+            if field in self.json['sitelinks']:
+                title = self.json['sitelinks'][field]['title']
                 if title:
                     title = title.replace(' ', '_')
                     return f"https://{lang}.wikipedia.org/wiki/{title}"
 
     def extract_qnames(self):
-        for n in QSURNAMES:
+        """ extract the first available from mames, male given name.... """
+        for n in QNAMES:
             if n in self.json['claims']:
                 return [extract_datavalue(x) for x in self.json['claims'][n]]
 
     def extract_qsurnames(self):
-        for n in QNAMES:
+        """ as extract_qnames also if in this case QSURNAMES in 1 element. """
+        for n in QSURNAMES:
             if n in self.json['claims']:
                 return [extract_datavalue(x) for x in self.json['claims'][n]]
 

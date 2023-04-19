@@ -99,7 +99,7 @@ CREATE INDEX idx_viafs_human ON viafs (human_id);
 You may use
 
 ```bash
-/bin/restart.py -db /tmp/pippo.db
+/bin/prepare_db.py -db /tmp/pippo.db
 ```
 
 To start parsing
