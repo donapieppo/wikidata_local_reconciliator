@@ -12,8 +12,9 @@ QNAMES = {
 }
 
 QSURNAMES = {
-    'P734',    # family name
-    'Q101352'  # family name
+    'P734',     # family name
+    'Q101352',  # family name
+    'Q202444'   # given name
 }
 
 QNAMES_AND_SURNAMES = QNAMES.union(QSURNAMES)
