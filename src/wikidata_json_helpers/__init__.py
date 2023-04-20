@@ -12,6 +12,15 @@ def check_value(json_obj, path, expected):
     """ check_value(json_obj, "abels.en.value", "pippo") """
     return extract_value(json_obj, path) == expected
 
+def extract_datavalues(j):
+    res = []
+    for x in j:
+        d = extract_datavalue(x)
+        if d and d != 'null':
+            res.append(d)
+    return res
+
+
 def extract_datavalue(j):
     """ extract_datavalue(J['claims']['P214'][0]) """
     try:
