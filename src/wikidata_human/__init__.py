@@ -75,14 +75,14 @@ class WikidataHuman:
         for n in QNAMES:
             if n in self.json['claims']:
                 return [extract_datavalue(x) for x in self.json['claims'][n]]
-        return([])
+        return []
 
     def extract_qsurnames(self):
         """ as extract_qnames also if in this case QSURNAMES in 1 element. """
         for n in QSURNAMES:
             if n in self.json['claims']:
                 return [extract_datavalue(x) for x in self.json['claims'][n]]
-         return([])
+        return []
 
     # return int with sign
     def extract_year(self, p):
