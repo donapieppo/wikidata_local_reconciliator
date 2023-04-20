@@ -1,10 +1,11 @@
 import json
-from wikidata_json_helpers import extract_value, extract_datavalue
+from wikidata_json_helpers import extract_value, extract_datavalue, extract_datavalues
 
 QNAMES = {
     'P735',       # given name
     'Q12308941',  # male given name (Q12308941)
     'Q11879590',  # female given name (Q11879590)
+    # ? birth name (P1477) 
 }
 
 QSURNAMES = {
@@ -74,14 +75,14 @@ class WikidataHuman:
         """ extract the first available from mames, male given name.... """
         for n in QNAMES:
             if n in self.json['claims']:
-                return [extract_datavalue(x) for x in self.json['claims'][n]]
+                return extract_datavalues(self.json['claims'][n])
         return []
 
     def extract_qsurnames(self):
         """ as extract_qnames also if in this case QSURNAMES in 1 element. """
         for n in QSURNAMES:
             if n in self.json['claims']:
-                return [extract_datavalue(x) for x in self.json['claims'][n]]
+                return extract_datavalues(self.json['claims'][n])
         return []
 
     # return int with sign
