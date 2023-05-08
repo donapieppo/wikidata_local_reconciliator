@@ -6,14 +6,15 @@ OCCUPATIONS = {
 }
 
 QNAMES = {
-    'P734',       # name
-    'Q101352',    # family name (Q101352)
+    'P735',       # given name
     'Q12308941',  # male given name (Q12308941)
     'Q11879590',  # female given name (Q11879590)
 }
 
 QSURNAMES = {
-    'P735'  # surname
+    'P734',     # family name
+    'Q101352',  # family name
+    'Q202444'   # given name
 }
 
 QNAMES_AND_SURNAMES = QNAMES.union(QSURNAMES)

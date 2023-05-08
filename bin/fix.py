@@ -5,7 +5,7 @@ import json
 import sqlite3
 from os.path import exists
 
-args = argparse.ArgumentParser(description='Parse a wikidata gz dump file and save in sqlite3 db.')
+args = argparse.ArgumentParser(description='Add qnames and qsurnames in names.')
 
 args.add_argument('-db', metavar='filename', nargs=1, type=str,
                    help='the sqlite3 file to read/rwite data.',
@@ -21,6 +21,7 @@ if (not exists(db)):
 
 connection = sqlite3.connect(db)
 connection.row_factory = sqlite3.Row
+
 cursor_human = connection.cursor()
 cursor_name = connection.cursor()
 cursor_wditem = connection.cursor()
@@ -36,8 +37,22 @@ def update_human(human_id, name, surname):
             ) WHERE id=?
         """, (name, surname, human_id))
     connection.commit()
-    return cursor_human.lastrowid
 
+
+def add_wdname(tot, qval):
+    if not qval:
+        return tot
+
+    cursor_wditem.execute("SELECT * FROM wditems WHERE wiki_id = ?", (qval,))
+    res = cursor_wditem.fetchone()
+
+    if res and res['labels']:
+        if tot == "":
+            tot = res['labels']
+        else:
+            tot = tot + " " + res['labels']
+
+    return tot.lower()
 
 cursor_human.execute("SELECT * from humans")
 
@@ -59,9 +74,7 @@ def add_wdname(tot, qval):
     return tot.lower()
 
 for row in cursor_human:
-    print(f"--- row {row['id']} / {row['wiki_id']} ----")
-    print(row['qnames'])
-    print(row['qsurnames'])
+    print(f"{row['id']} --- qnames: {row['qnames']} --- qsurnames: {row['qsurnames']} --- {row['wiki_id']}")
 
     qnames = json.loads(row['qnames']) if row['qnames'] != 'null' else []
     qsurnames = json.loads(row['qsurnames']) if row['qsurnames'] != 'null' else []
@@ -72,12 +85,14 @@ for row in cursor_human:
     for qsurname in qsurnames:
         tot = add_wdname(tot, qsurname)
 
-    cursor_name.execute("SELECT count(*) as c FROM names WHERE name = ? AND human_id = ?", (tot, row['id']))
-    row = cursor_name.fetchone()
+    cursor_name.execute("SELECT count(*) as c FROM names "
+                        "WHERE name = ? AND human_id = ? LIMIT 1",
+                        (tot, row['id']))
+    res = cursor_name.fetchone()
 
-    if row['c'] == 0:
+    if res['c'] == 0:
         print(tot)
     input(".")
 
-#connection.commit()
-#connection.close()
+connection.commit()
+connection.close()
