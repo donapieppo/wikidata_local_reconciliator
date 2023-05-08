@@ -44,7 +44,15 @@ mkdir wikidata
 bzcat latest-all.json.bz2 | split -l 100000 -d -a 4 --filter='bzip2 > wikidata/$FILE.json.bz2' - split-
 ```
 
-Create a `data/wd.db` sqlite3 database with this schema:
+## Prepare the database
+
+With the command
+
+```bash
+/bin/prepare_db.py -db /tmp/pippo.db
+```
+
+you create a `data/wd.db` sqlite3 database with this schema:
 
 ```sql
 CREATE TABLE humans (
@@ -96,16 +104,24 @@ CREATE INDEX idx_viafs_wiki ON viafs (wiki_id);
 CREATE INDEX idx_viafs_human ON viafs (human_id);
 ```
 
-You may use
-
-```bash
-/bin/prepare_db.py -db /tmp/pippo.db
-```
+## Parsiong the wikidata dump
 
 To start parsing
 
 ```bash
 ./bin/parse.py -f /home/backup/wikidata/split-0019.json.bz2 -db /tmp/pippo.db
+```
+
+## Use the library
+
+The following snippet asks to reconciliate the string `martin scorsese` with
+the request that the author is a film_director and that it is born after year 2000.
+
+```python
+from wikidata_local_reconciliator import WikidataLocalReconciliator
+
+reconciliator = WikidataLocalReconciliator(db_file='/home/data/wd.db')
+result = reconciliator.ask('martin scorsese', 2000, 'film_director')
 ```
 
 ## DB 
