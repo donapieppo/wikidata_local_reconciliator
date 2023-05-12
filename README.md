@@ -27,21 +27,21 @@ returns the following result (main data):
 'wikipedia_url': 'https://it.wikipedia.org/wiki/Martin_Scorsese'
 ```
 
-## Start
+## Dowload wikidata dump
 
 Visit [https://www.wikidata.org/wiki/Wikidata:Database_download] and get
 latest json.bz2. You can also split it while downloading
 
 ```
-mkdir wikidata
-wget -O - https://dumps.wikimedia.org/wikidatawiki/entities/latest-all.json.bz2 | bzcat | split -l 100000 -d -a 4 --filter='bzip2 > wikidata/$FILE.json.bz2' - split-
+mkdir -p wikidata/data
+wget -O - https://dumps.wikimedia.org/wikidatawiki/entities/latest-all.json.bz2 | bzcat | split -l 100000 -d -a 4 --filter='bzip2 > wikidata/data/$FILE.json.bz2' - split-
 ```
 
 If you already have downloaded the dump, you can just split with:
 
 ```bash
 mkdir wikidata
-bzcat latest-all.json.bz2 | split -l 100000 -d -a 4 --filter='bzip2 > wikidata/$FILE.json.bz2' - split-
+bzcat latest-all.json.bz2 | split -l 100000 -d -a 4 --filter='bzip2 > wikidata/data/$FILE.json.bz2' - split-
 ```
 
 ## Prepare the database
@@ -49,10 +49,10 @@ bzcat latest-all.json.bz2 | split -l 100000 -d -a 4 --filter='bzip2 > wikidata/$
 With the command
 
 ```bash
-/bin/prepare_db.py -db /tmp/pippo.db
+/bin/prepare_db.py -db wikidata/wikidata.db
 ```
 
-you create a `data/wd.db` sqlite3 database with this schema:
+you create a `wikidata.db` sqlite3 database with this schema:
 
 ```sql
 CREATE TABLE humans (
@@ -104,18 +104,23 @@ CREATE INDEX idx_viafs_wiki ON viafs (wiki_id);
 CREATE INDEX idx_viafs_human ON viafs (human_id);
 ```
 
-## Parsiong the wikidata dump
+## Parse the wikidata dump
 
 To start parsing
 
 ```bash
-./bin/parse.py -f /home/backup/wikidata/split-0019.json.bz2 -db /tmp/pippo.db
+for f in wikidata/data/split*.json.bz2
+do
+        ./bin/parse.py -f $f -db /wikidata/wikidata.db
+done
 ```
+
+Now you can also remove the `wikidata/data` dir that contains the dump.
 
 ## Use the library
 
 The following snippet asks to reconciliate the string `martin scorsese` with
-the request that the author is a film_director and that it is born after year 2000.
+the request that the author is a `film_director` and that it is born after year 2000.
 
 ```python
 from wikidata_local_reconciliator import WikidataLocalReconciliator
@@ -124,7 +129,17 @@ reconciliator = WikidataLocalReconciliator(db_file='/home/data/wd.db')
 result = reconciliator.ask('martin scorsese', 2000, 'film_director')
 ```
 
-## DB 
+In `src/wikidata_occupation/defaults.py` you find the most common 
+occupations for my reconciliation interest. Feel free to add yours to
+the file. You can also add occupations for a specific search with
+
+```python
+reconciliator = WikidataLocalReconciliator(db_file='/home/data/wd.db')
+reconciliator.add_occupation('lithographe', 'Q16947657')
+result = reconciliator.ask('john doe', 2000, 'lithographe')
+```
+
+## Observations on the DB 
 
 `humans` on the first pass is filled with `qnames` and `qsurnames` which are the wikidata ids of name and surname of the human.
 
