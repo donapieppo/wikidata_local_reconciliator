@@ -65,6 +65,7 @@ class WikidataLocalParser:
                     """, (human_id, wiki_id, viaf_id))
 
 
+    """ gets a json line from wikidata dump and save if human """
     def save(self, j):
         if ('P31' not in j['claims']):
             return None  # P31 istance of

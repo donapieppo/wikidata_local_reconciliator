@@ -11,17 +11,16 @@ from os.path import exists
 
 from wikidata_local_parser import WikidataLocalParser
 
-args = argparse.ArgumentParser(description="Parse a wikidata gz dump file "
-                                           "and save in sqlite3 db.")
-args.add_argument('-f', dest='filename', metavar='filename', nargs=1, type=str,
-                  help='the dump wikipedia file in gz format.',
-                  required=True)
-args.add_argument('-db', dest='db', metavar='filename', nargs=1, type=str,
+parser = argparse.ArgumentParser(description="Parse a wikidata json bz2 dump file "
+                                           "and save data in sqlite3 db.")
+parser.add_argument('filename', type=str,
+                  help='the dump wikipedia file in json.bz2 format.')
+parser.add_argument('-db', dest='db', metavar='db', nargs=1, type=str,
                   help='the sqlite3 file to save data.',
                   required=True)
 
-args = args.parse_args()
-filename = args.filename[0]
+args = parser.parse_args()
+filename = args.filename
 db = args.db[0]
 
 if (not exists(filename)):

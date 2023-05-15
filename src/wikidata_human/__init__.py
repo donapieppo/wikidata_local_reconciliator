@@ -23,7 +23,6 @@ class WikidataHuman:
         self.label = self.extract_label()
         self.qnames = self.extract_qnames()
         self.qsurnames = self.extract_qsurnames()
-        self.viaf_id = self.extract_viafid()
 
         self.year_of_birth = self.extract_year('P569')
         self.year_of_death = self.extract_year('P570')
@@ -37,14 +36,6 @@ class WikidataHuman:
         self.wikipedia_url = self.extract_wikipedia_url()
         self.nreferences = self.count_references()
 
-    def extract_viafid(self):
-        if 'P214' in self.json['claims']:
-            x = self.json['claims']['P214'][0]
-            if x:
-                return extract_datavalue(x)
-            #
-            # res = [extract_datavalue(x) for x in self.json['claims']['P214']]
-            # return (None if res == [None] else res)
 
     def extract_label(self):
         for lang in self.languages:
@@ -119,7 +110,6 @@ class WikidataHuman:
         cursor.execute("""
             INSERT INTO humans (
                 wiki_id,
-                viaf_id,
                 qnames,
                 qsurnames,
                 label,
@@ -132,7 +122,6 @@ class WikidataHuman:
             ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             """, (
                 self.wiki_id,
-                (json.dumps(self.viaf_id) if self.viaf_id else None),
                 json.dumps(self.qnames),
                 json.dumps(self.qsurnames),
                 self.label,

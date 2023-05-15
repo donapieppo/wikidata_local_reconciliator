@@ -43,6 +43,5 @@ class TestWikidataLocalReconciliator(unittest.TestCase):
         self.assertEqual(res['wiki_id'], "Q340239")
 
 
-
 if __name__ == '__main__':
     unittest.main()

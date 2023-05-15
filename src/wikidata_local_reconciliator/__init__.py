@@ -38,13 +38,6 @@ class WikidataLocalReconciliator():
             name = unidecode(name)
         return(name)
 
-    def fix_viaf(self, row):
-        """ in sqlite3 we save as json.dumps """
-        if row and row['viaf_id']:
-            ids = json.loads(row['viaf_id'])
-            row['viaf_id'] = ids[0] if ids else None
-        return(row)
-
     def check_name_from_wiki_id(self, wiki_id, name):
         """ check if human identified by wiki_id has the name """
         res = self.cursor.execute("""
@@ -56,7 +49,7 @@ class WikidataLocalReconciliator():
         res = self.cursor.execute("""
                 SELECT * from humans WHERE wiki_id = ?
                 """, (wiki_id, )).fetchone()
-        return self.fix_viaf(dict(res)) if res else None
+        return res if res else None
 
     def get_by_viaf_id(self, viaf_id):
         res = self.cursor.execute("""
@@ -64,7 +57,7 @@ class WikidataLocalReconciliator():
             LEFT JOIN viafs ON viafs.human_id = humans.id
             WHERE viafs.viaf_id = ?
             """, (viaf_id, )).fetchone()
-        return self.fix_viaf(dict(res)) if res else None
+        return res if res else None
 
     # re.sub(r'-',' ', name)
     # unidecode(name)
@@ -81,7 +74,7 @@ class WikidataLocalReconciliator():
         second = None
 
         for row in all_rows:
-            row = self.fix_viaf(dict(row))
+            row = dict(row)
             if self.wd_occupation.check(row, occupations) and self.check_year(row, year):
                 if (not best) or (row['nreferences'] > best['nreferences']):
                     second = best

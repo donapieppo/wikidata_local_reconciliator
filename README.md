@@ -58,7 +58,6 @@ you create a `wikidata.db` sqlite3 database with this schema:
 CREATE TABLE humans (
   id INTEGER PRIMARY KEY,
   wiki_id TEXT,
-  viaf_id TEXT,
   qnames TEXT,
   qsurnames TEXT,
   name TEXT,
