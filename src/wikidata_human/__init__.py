@@ -119,7 +119,7 @@ class WikidataHuman:
                 occupations,
                 wikipedia_url,
                 nreferences
-            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             """, (
                 self.wiki_id,
                 json.dumps(self.qnames),

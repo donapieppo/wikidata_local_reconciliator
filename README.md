@@ -49,7 +49,7 @@ bzcat latest-all.json.bz2 | split -l 100000 -d -a 4 --filter='bzip2 > wikidata/d
 With the command
 
 ```bash
-/bin/prepare_db.py -db wikidata/wikidata.db
+./bin/prepare_db.py -db wikidata/wikidata.db
 ```
 
 you create a `wikidata.db` sqlite3 database with this schema:
@@ -72,7 +72,6 @@ CREATE TABLE humans (
 );
 
 CREATE UNIQUE INDEX idx_humans_wid ON humans (wiki_id);
-CREATE INDEX idx_humans_viafid ON humans (viaf_id);
 
 CREATE TABLE names (
   id INTEGER PRIMARY KEY,
@@ -110,7 +109,7 @@ To start parsing
 ```bash
 for f in wikidata/data/split*.json.bz2
 do
-        ./bin/parse.py -f $f -db /wikidata/wikidata.db
+        ./bin/parse.py -db ./wikidata/wikidata.db $f
 done
 ```
 
