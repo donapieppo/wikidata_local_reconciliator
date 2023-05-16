@@ -11,9 +11,9 @@ here = pathlib.Path(__file__).parent.resolve()
 long_description = (here / "README.md").read_text(encoding="utf-8")
 
 setup(
-    name="wikidata_local_reconciliation",  
+    name="wikidata_local_reconciliator",  
     version="0.0.1",  
-    description="Wikipedia Local Reconciliation",
+    description="Wikipedia Local Reconciliator",
     author="donapieppo",
     # When your source code is in a subdirectory under the project root, e.g.
     # `src/`, it is necessary to specify the `package_dir` argument.
