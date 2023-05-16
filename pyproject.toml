@@ -3,7 +3,7 @@ requires = ["setuptools", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "wikidata_local_reconciliation"
+name = "wikidata_local_reconciliator"
 version = "0.0.1"
 authors = [
   { name="Donapieppo", email="donapieppo@yahoo.it" },
