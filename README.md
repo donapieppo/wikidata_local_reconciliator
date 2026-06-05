@@ -27,21 +27,26 @@ returns the following result (main data):
 'wikipedia_url': 'https://it.wikipedia.org/wiki/Martin_Scorsese'
 ```
 
-## Dowload wikidata dump
+## Download wikidata dump
 
 Visit [https://www.wikidata.org/wiki/Wikidata:Database_download] and get
-latest json.bz2. You can also split it while downloading
-
-```
-mkdir -p wikidata/data
-wget -O - https://dumps.wikimedia.org/wikidatawiki/entities/latest-all.json.bz2 | bzcat | split -l 100000 -d -a 4 --filter='bzip2 > wikidata/data/$FILE.json.bz2' - split-
-```
-
-If you already have downloaded the dump, you can just split with:
+latest json.bz2. Download the dump first, then split it. 
 
 ```bash
-mkdir wikidata
-bzcat latest-all.json.bz2 | split -l 100000 -d -a 4 --filter='bzip2 > wikidata/data/$FILE.json.bz2' - split-
+mkdir -p wikidata/data
+
+curl --location --fail \
+  --continue-at - \
+  --retry 20 \
+  --retry-all-errors \
+  --retry-delay 10 \
+  --connect-timeout 30 \
+  --speed-time 60 \
+  --speed-limit 1024 \
+  --output wikidata/latest-all.json.bz2 \
+  https://dumps.wikimedia.org/wikidatawiki/entities/latest-all.json.bz2
+
+bzcat wikidata/latest-all.json.bz2 | split -l 100000 -d -a 4 --filter='bzip2 > wikidata/data/$FILE.json.bz2' - split-
 ```
 
 ## Prepare the database
