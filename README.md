@@ -27,7 +27,7 @@ returns the following result (main data):
 'wikipedia_url': 'https://it.wikipedia.org/wiki/Martin_Scorsese'
 ```
 
-## Dowload wikidata dump
+## Download wikidata dump
 
 Visit [https://www.wikidata.org/wiki/Wikidata:Database_download] and get
 latest json.bz2.
