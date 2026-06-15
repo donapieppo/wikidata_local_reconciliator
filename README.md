@@ -30,18 +30,14 @@ returns the following result (main data):
 ## Dowload wikidata dump
 
 Visit [https://www.wikidata.org/wiki/Wikidata:Database_download] and get
-latest json.bz2. You can also split it while downloading
+latest json.bz2.
+Install `lbzip2` for better speed.
 
-```
-mkdir -p wikidata/data
-wget -O - https://dumps.wikimedia.org/wikidatawiki/entities/latest-all.json.bz2 | bzcat | split -l 100000 -d -a 4 --filter='bzip2 > wikidata/data/$FILE.json.bz2' - split-
-```
-
-If you already have downloaded the dump, you can just split with:
+You can split with:
 
 ```bash
-mkdir wikidata
-bzcat latest-all.json.bz2 | split -l 100000 -d -a 4 --filter='bzip2 > wikidata/data/$FILE.json.bz2' - split-
+mkdir -p wikidata/data
+lbzip2 -dc -n 4 latest-all.json.bz2 | split -l 100000 -d -a 4 --filter='lbzip2 -c -n 4 > wikidata/data/$FILE.json.bz2' - split-
 ```
 
 ## Prepare the database
