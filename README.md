@@ -129,7 +129,7 @@ Then we must add the names/surnames from given name and family name
 that are not in the `names` table.
 
 ```
-./bin/complete_names.py
+./bin/complete_names.py -db ./wikidata/wikidata.db
 ```
 
 Now you can also remove the `wikidata/data` dir that contains the dump.
@@ -138,6 +138,17 @@ The size of the `wikidata.db` file is about 2.5G and contains something like
 10 millions of person and 14 millions of names.
 
 ## Use the library
+
+The database path can be passed as `db_file` or set with the `WIKIDATA_DB`
+environment variable. If neither is provided, the library looks for
+`wikidata.db` in the current working directory. For example, set the variable
+in the systemd service to use an absolute path:
+
+```ini
+Environment=WIKIDATA_DB=/home/valentina/wikidata_local_reconciliation/wikidata.db
+```
+
+The Flask server uses this setting for its database connection.
 
 The following snippet asks to reconciliate the string `martin scorsese` with
 the request that the author is a `film_director` and that it is born after year 2000.
