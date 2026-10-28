@@ -27,6 +27,22 @@ returns the following result (main data):
 'wikipedia_url': 'https://it.wikipedia.org/wiki/Martin_Scorsese'
 ```
 
+## Installation
+
+Install Python 3.7 or newer. From the project directory
+
+```bash
+python3 -m venv .venv
+source .venv/bin/activate
+python -m pip install .
+```
+
+For development, install an editable copy with `python -m pip install -e .`.
+
+If you run the optional Flask server, install its dependencies in the same
+environment with `python -m pip install ".[server]"`. Run these commands and
+the server as the non-root account that owns the project and its data files.
+
 ## Download wikidata dump
 
 Visit [https://www.wikidata.org/wiki/Wikidata:Database_download] and get
