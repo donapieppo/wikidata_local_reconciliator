@@ -1,14 +1,17 @@
 import sqlite3
 import re
+import os
 from unidecode import unidecode
 
 from wikidata_occupation import WikidataOccupation
 
-LOCAL_FILE = "/home/rails/OpenMlol/tmp/wikidata.db"
+DEFAULT_DB_FILE = "wikidata.db"
 
 
 class WikidataLocalReconciliator():
-    def __init__(self, db_file=LOCAL_FILE):
+    def __init__(self, db_file=None):
+        if db_file is None:
+            db_file = os.environ.get("WIKIDATA_DB", DEFAULT_DB_FILE)
         connection = sqlite3.connect(db_file)
         connection.row_factory = sqlite3.Row
         self.cursor = connection.cursor()

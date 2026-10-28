@@ -13,7 +13,7 @@ def api_search():
     occupations = request.args.get('occupations')
     year = int(year) if (year and len(year) > 0) else 2024
 
-    reconciliator = WikidataLocalReconciliator(db_file='../../../tmp/wikidata.db')
+    reconciliator = WikidataLocalReconciliator()
     result = reconciliator.ask(name, year, occupations)
 
     response = app.response_class(
@@ -29,7 +29,7 @@ def search():
     occupations = ", ".join(request.form.getlist('occupations'))
     year = int(year) if (year and len(year) > 0) else 2024
 
-    reconciliator = WikidataLocalReconciliator(db_file='../../../tmp/wikidata.db')
+    reconciliator = WikidataLocalReconciliator()
     result = reconciliator.ask(name, year, occupations)
 
     if result:
