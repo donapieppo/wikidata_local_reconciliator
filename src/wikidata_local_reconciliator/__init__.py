@@ -7,15 +7,29 @@ from wikidata_occupation import WikidataOccupation
 
 DEFAULT_DB_FILE = "wikidata.db"
 
+# Il migliore candidato viene accettato solo se ha almeno AMBIGUITY_RATIO volte
+# le referenze del secondo (es. 2 -> almeno il doppio). None disattiva il controllo.
+AMBIGUITY_RATIO = 2
+# Un nome di una sola parola ("martin", "jean") viene accettato solo se la persona
+# è molto nota (Giotto, Caravaggio...). None disattiva il controllo.
+SINGLE_WORD_MIN_REFERENCES = 50
+
 
 class WikidataLocalReconciliator():
-    def __init__(self, db_file=None):
+    def __init__(self, db_file=None,
+                 ambiguity_ratio=AMBIGUITY_RATIO,
+                 single_word_min_references=SINGLE_WORD_MIN_REFERENCES):
         if db_file is None:
             db_file = os.environ.get("WIKIDATA_DB", DEFAULT_DB_FILE)
-        connection = sqlite3.connect(db_file)
-        connection.row_factory = sqlite3.Row
-        self.cursor = connection.cursor()
+        self.connection = sqlite3.connect(db_file)
+        self.connection.row_factory = sqlite3.Row
+        self.cursor = self.connection.cursor()
         self.wd_occupation = WikidataOccupation()
+        self.ambiguity_ratio = ambiguity_ratio
+        self.single_word_min_references = single_word_min_references
+
+    def close(self):
+        self.connection.close()
 
     def add_occupation(self, name, wiki_id):
         self.wd_occupation.add_occupation(name, wiki_id)
@@ -67,9 +81,9 @@ class WikidataLocalReconciliator():
             """, (viaf_id, )).fetchone()
         return res if res else None
 
-    # re.sub(r'-',' ', name)
-    # unidecode(name)
-    def search(self, name, year=None, occupations=None):
+    def candidates(self, name, year=None, occupations=None):
+        """Persone con quel nome che rispettano anno e occupazioni,
+        una sola riga per persona, ordinate per nreferences decrescente."""
         name = self.clear_name(name)
         all_rows = self.cursor.execute("""
             SELECT DISTINCT humans.*, viafs.viaf_id FROM humans
@@ -77,34 +91,61 @@ class WikidataLocalReconciliator():
             LEFT JOIN viafs ON humans.id = viafs.human_id
             WHERE names.name = ?
             """, (name, )).fetchall()
-        # COLLATE NOCASE
 
-        best = None
-        second = None
-
+        # la LEFT JOIN su viafs produce una riga per ogni VIAF della stessa persona:
+        # teniamo una sola riga per wiki_id, altrimenti la persona "fa concorrenza" a se stessa
+        by_wiki_id = {}
         for row in all_rows:
             row = dict(row)
-            if self.wd_occupation.check(row, occupations) and self.check_year(row, year):
-                if (not best) or (row['nreferences'] > best['nreferences']):
-                    second = best
-                    best = row
-                else:
-                    second = row
-        return(best if best else second)
+            if not (self.wd_occupation.check(row, occupations) and self.check_year(row, year)):
+                continue
+            if row['wiki_id'] not in by_wiki_id:
+                by_wiki_id[row['wiki_id']] = row
+
+        return sorted(by_wiki_id.values(), key=lambda r: r['nreferences'] or 0, reverse=True)
+
+    def is_confident(self, name, candidates):
+        """True se il primo candidato è abbastanza affidabile da essere restituito."""
+        best = candidates[0]
+        best_refs = best['nreferences'] or 0
+
+        if self.single_word_min_references is not None and len(name.split()) == 1:
+            if best_refs < self.single_word_min_references:
+                return False
+
+        if self.ambiguity_ratio is not None and len(candidates) > 1:
+            second_refs = candidates[1]['nreferences'] or 0
+            if best_refs < self.ambiguity_ratio * second_refs:
+                return False
+
+        return True
+
+    def search(self, name, year=None, occupations=None):
+        """Il candidato migliore, oppure None se non c'è o se è ambiguo."""
+        name = self.clear_name(name)
+        candidates = self.candidates(name, year=year, occupations=occupations)
+        if not candidates:
+            return None
+        if not self.is_confident(name, candidates):
+            return None
+        return candidates[0]
 
     def ask(self, name, year=None, occupations=None):
-        cname = self.clear_name(name)
-        res = self.search(cname, year=year, occupations=occupations)
-        if not res:
-            cname = self.clear_name(name, replace_dash=True)
-            if cname != name:
-                res = self.search(cname, year=year, occupations=occupations)
-        
-        if not res:
-            cname = self.clear_name(name, replace_dash=True, with_unidecode=True)
-            if cname != name:
-                res = self.search(cname, year=year, occupations=occupations)
-        return res
+        if not name or not name.strip():
+            return None
+
+        # varianti del nome, dalla più fedele alla più permissiva, senza ripetizioni
+        variants = []
+        for options in ({}, {'replace_dash': True}, {'replace_dash': True, 'with_unidecode': True}):
+            cname = self.clear_name(name, **options)
+            if cname and cname not in variants:
+                variants.append(cname)
+
+        for cname in variants:
+            res = self.search(cname, year=year, occupations=occupations)
+            if res:
+                return res
+        return None
         
     def show_occupations(self, res):
         if res:
