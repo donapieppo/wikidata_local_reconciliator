@@ -40,6 +40,9 @@ class WikidataLocalReconciliator():
 
     def clear_name(self, name, replace_dash=False, with_unidecode=False):
         """Clear the name and return it"""
+        # Future improvements: normalize single tabs and other whitespace,
+        # apostrophe/dash variants, and "surname, given name" order.
+        # Normalize stored names too when changing the lookup format.
         # fist lower the name since in db they are lowercase
         name = name.lower()
         # take off brackets (200xii)
@@ -76,7 +79,7 @@ class WikidataLocalReconciliator():
 
     # re.sub(r'-',' ', name)
     # unidecode(name)
-    def search(self, name, year=None, occupations=None):
+    def _search_with_status(self, name, year=None, occupations=None):
         name = self.clear_name(name)
         all_rows = self.cursor.execute("""
             SELECT humans.* FROM humans
@@ -101,28 +104,34 @@ class WikidataLocalReconciliator():
 
         if best is not None and self.single_word_min_references is not None:
             if len(name.split()) == 1 and (best['nreferences'] or 0) < self.single_word_min_references:
-                return None
+                return None, True
 
         if best is not None and second is not None and self.ambiguity_ratio is not None:
             best_refs = best['nreferences'] or 0
             second_refs = second['nreferences'] or 0
             if best_refs == 0 or best_refs < self.ambiguity_ratio * second_refs:
-                return None
-        return best
+                return None, True
+        return best, False
+
+    def search(self, name, year=None, occupations=None):
+        result, _ = self._search_with_status(name, year, occupations)
+        return result
 
     def ask(self, name, year=None, occupations=None):
-        cname = self.clear_name(name)
-        res = self.search(cname, year=year, occupations=occupations)
-        if not res:
-            cname = self.clear_name(name, replace_dash=True)
-            if cname != name:
-                res = self.search(cname, year=year, occupations=occupations)
-        
-        if not res:
-            cname = self.clear_name(name, replace_dash=True, with_unidecode=True)
-            if cname != name:
-                res = self.search(cname, year=year, occupations=occupations)
-        return res
+        if not name or not name.strip():
+            return None
+
+        variants = []  # Example: "marie-ann" -> ["marie-ann", "marie ann"].
+        for options in ({}, {'replace_dash': True}, {'replace_dash': True, 'with_unidecode': True}):
+            cname = self.clear_name(name, **options)
+            if cname and cname not in variants:
+                variants.append(cname)
+
+        for cname in variants:
+            result, rejected = self._search_with_status(cname, year, occupations)
+            if result or rejected:
+                return result
+        return None
         
     def show_occupations(self, res):
         if res:
