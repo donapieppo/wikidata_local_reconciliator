@@ -122,10 +122,20 @@ class WikidataLocalReconciliator():
             return None
 
         variants = []  # Example: "marie-ann" -> ["marie-ann", "marie ann"].
-        for options in ({}, {'replace_dash': True}, {'replace_dash': True, 'with_unidecode': True}):
-            cname = self.clear_name(name, **options)
-            if cname and cname not in variants:
-                variants.append(cname)
+        base_names = [name]
+        if name.count(',') == 1:
+            surname, given_name = name.split(',', 1)
+            if surname.strip() and given_name.strip():
+                base_names.append(f'{given_name.strip()} {surname.strip()}')
+                base_names.append(f'{surname.strip()} {given_name.strip()}')
+
+        # "Anne-Marie, Ginini" also tries the variants
+        # "ginini anne-marie", "ginini anne marie", "anne-marie ginini", and "anne marie ginini"
+        for base_name in base_names:
+            for options in ({}, {'replace_dash': True}, {'replace_dash': True, 'with_unidecode': True}):
+                cname = self.clear_name(base_name, **options)
+                if cname and cname not in variants:
+                    variants.append(cname)
 
         for cname in variants:
             result, rejected = self._search_with_status(cname, year, occupations)
