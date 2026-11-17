@@ -9,6 +9,8 @@ app = Flask(__name__)
 def api_search():
     # Get query parameters from the URL
     name = request.args.get('name')
+    if not name or not name.strip():
+        return jsonify({'error': 'name is required'}), 400
     year = request.args.get('year')
     occupations = request.args.get('occupations')
     year = int(year) if (year and len(year) > 0) else 2024
