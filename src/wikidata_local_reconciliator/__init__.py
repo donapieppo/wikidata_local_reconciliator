@@ -72,10 +72,11 @@ class WikidataLocalReconciliator():
     def search(self, name, year=None, occupations=None):
         name = self.clear_name(name)
         all_rows = self.cursor.execute("""
-            SELECT DISTINCT humans.*, viafs.viaf_id FROM humans
-            LEFT JOIN names ON humans.id = names.human_id
-            LEFT JOIN viafs ON humans.id = viafs.human_id
-            WHERE names.name = ?
+            SELECT humans.* FROM humans
+            WHERE EXISTS (
+                SELECT 1 FROM names
+                WHERE names.human_id = humans.id AND names.name = ?
+            )
             """, (name, )).fetchall()
         # COLLATE NOCASE
 
