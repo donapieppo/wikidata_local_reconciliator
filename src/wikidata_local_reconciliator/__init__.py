@@ -6,16 +6,19 @@ from unidecode import unidecode
 from wikidata_occupation import WikidataOccupation
 
 DEFAULT_DB_FILE = "wikidata.db"
+# The best match needs at least this many times the second-best's references.
+AMBIGUITY_RATIO = 2
 
 
 class WikidataLocalReconciliator():
-    def __init__(self, db_file=None):
+    def __init__(self, db_file=None, ambiguity_ratio=AMBIGUITY_RATIO):
         if db_file is None:
             db_file = os.environ.get("WIKIDATA_DB", DEFAULT_DB_FILE)
         connection = sqlite3.connect(db_file)
         connection.row_factory = sqlite3.Row
         self.cursor = connection.cursor()
         self.wd_occupation = WikidataOccupation()
+        self.ambiguity_ratio = ambiguity_ratio
 
     def add_occupation(self, name, wiki_id):
         self.wd_occupation.add_occupation(name, wiki_id)
@@ -86,12 +89,18 @@ class WikidataLocalReconciliator():
         for row in all_rows:
             row = dict(row)
             if self.wd_occupation.check(row, occupations) and self.check_year(row, year):
-                if (not best) or (row['nreferences'] > best['nreferences']):
+                if best is None or (row['nreferences'] or 0) > (best['nreferences'] or 0):
                     second = best
                     best = row
-                else:
+                elif second is None or (row['nreferences'] or 0) > (second['nreferences'] or 0):
                     second = row
-        return(best if best else second)
+
+        if best is not None and second is not None and self.ambiguity_ratio is not None:
+            best_refs = best['nreferences'] or 0
+            second_refs = second['nreferences'] or 0
+            if best_refs == 0 or best_refs < self.ambiguity_ratio * second_refs:
+                return None
+        return best
 
     def ask(self, name, year=None, occupations=None):
         cname = self.clear_name(name)
