@@ -8,10 +8,13 @@ from wikidata_occupation import WikidataOccupation
 DEFAULT_DB_FILE = "wikidata.db"
 # The best match needs at least this many times the second-best's references.
 AMBIGUITY_RATIO = 2
+# A single-word name needs at least this many references to be accepted.
+SINGLE_WORD_MIN_REFERENCES = 50
 
 
 class WikidataLocalReconciliator():
-    def __init__(self, db_file=None, ambiguity_ratio=AMBIGUITY_RATIO):
+    def __init__(self, db_file=None, ambiguity_ratio=AMBIGUITY_RATIO,
+                 single_word_min_references=SINGLE_WORD_MIN_REFERENCES):
         if db_file is None:
             db_file = os.environ.get("WIKIDATA_DB", DEFAULT_DB_FILE)
         connection = sqlite3.connect(db_file)
@@ -19,6 +22,7 @@ class WikidataLocalReconciliator():
         self.cursor = connection.cursor()
         self.wd_occupation = WikidataOccupation()
         self.ambiguity_ratio = ambiguity_ratio
+        self.single_word_min_references = single_word_min_references
 
     def add_occupation(self, name, wiki_id):
         self.wd_occupation.add_occupation(name, wiki_id)
@@ -94,6 +98,10 @@ class WikidataLocalReconciliator():
                     best = row
                 elif second is None or (row['nreferences'] or 0) > (second['nreferences'] or 0):
                     second = row
+
+        if best is not None and self.single_word_min_references is not None:
+            if len(name.split()) == 1 and (best['nreferences'] or 0) < self.single_word_min_references:
+                return None
 
         if best is not None and second is not None and self.ambiguity_ratio is not None:
             best_refs = best['nreferences'] or 0
